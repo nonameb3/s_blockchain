@@ -4,8 +4,11 @@
   "description": "blockchain project",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch dev -e js dev/api.js",
-    "test": "node dev/__tests__/blockchain.test.js"
+    "start": "nodemon --watch dev -e js dev/node.js",
+    "test": "node dev/__tests__/blockchain.test.js",
+    "node_1": "nodemon --watch dev -e js dev/node.js 3001",
+    "node_2": "nodemon --watch dev -e js dev/node.js 3002",
+    "node_3": "nodemon --watch dev -e js dev/node.js 3003"
   },
   "repository": {
     "type": "git",
@@ -21,7 +24,8 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "nodemon": "^1.18.9",
-    "sha256": "^0.2.0"
+    "sha256": "^0.2.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "eslint": "^5.12.1",

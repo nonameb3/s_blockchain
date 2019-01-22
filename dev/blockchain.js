@@ -7,13 +7,13 @@ function Blockchain () {
   this.createNewBlock(100, '0', '0')
 }
 
-Blockchain.prototype.createNewBlock = function (nonce, previousBlockHash, has) {
+Blockchain.prototype.createNewBlock = function (nonce, previousBlockHash, hash) {
   const newBlock = {
     index: this.chain.length + 1,
     timestamp: Date.now(),
     transaction: this.pendingTransaction,
     nonce: nonce,
-    has: has,
+    hash: hash,
     previousBlockHash: previousBlockHash
   }
 
