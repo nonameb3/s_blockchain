@@ -4,6 +4,7 @@
   "description": "blockchain project",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --watch dev -e js dev/api.js",
     "test": "node dev/__tests__/blockchain.test.js"
   },
   "repository": {
@@ -16,6 +17,12 @@
     "url": "https://github.com/nonameb3/s_blockchain/issues"
   },
   "homepage": "https://github.com/nonameb3/s_blockchain#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "nodemon": "^1.18.9",
+    "sha256": "^0.2.0"
+  },
   "devDependencies": {
     "eslint": "^5.12.1",
     "eslint-config-standard": "^12.0.0",
@@ -23,8 +30,5 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0"
-  },
-  "dependencies": {
-    "sha256": "^0.2.0"
   }
 }
