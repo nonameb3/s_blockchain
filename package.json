@@ -1,0 +1,22 @@
+{
+  "name": "s_blockchain",
+  "version": "1.0.0",
+  "description": "blockchain project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nonameb3/s_blockchain.git"
+  },
+  "author": "waraphon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nonameb3/s_blockchain/issues"
+  },
+  "homepage": "https://github.com/nonameb3/s_blockchain#readme",
+  "devDependencies": {
+    "eslint": "^5.12.1"
+  }
+}
