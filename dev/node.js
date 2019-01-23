@@ -41,6 +41,21 @@ app.get('/mine', (req, res) => {
   })
 })
 
+// register a node and broadcast it in the network
+app.post('/register-broadcast-node', (req, res) => {
+
+})
+
+// register a node with network
+app.post('/register-node', (req, res) => {
+
+})
+
+// register multiple nides at one
+app.post('/register-node-bulk', (req, res) => {
+
+})
+
 app.listen(port, () => {
   console.log(`server start at port : ${port}`)
 })
