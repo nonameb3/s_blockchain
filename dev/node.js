@@ -51,7 +51,7 @@ app.post('/register-broadcast-node', (req, res) => {
   let regNodePromise = []
   bitcoin.networkNodes.map(networkNodeUrl => {
     const requestOption = {
-      url: `${networkNodeUrl}/refister-node`,
+      url: `${networkNodeUrl}/register-node`,
       method: 'POST',
       body: { newNodeUrl: newNodeUrl },
       json: true
@@ -81,15 +81,21 @@ app.post('/register-node', (req, res) => {
   const notAlreadyUrl = bitcoin.networkNodes.indexOf(newNodeUrl) === -1
   if (notCurrentNode && notAlreadyUrl) {
     bitcoin.networkNodes = [...bitcoin.networkNodes, newNodeUrl]
-  } else {
-    res.send({ message: 'New node already in network.' })
   }
   res.send({ message: 'New node registered successfully with node.' })
 })
 
 // register multiple nides at one
 app.post('/register-node-bulk', (req, res) => {
-
+  const { allnetworknode } = req.body
+  allnetworknode.map(networkNode => {
+    const notCurrentNode = bitcoin.currentNodeUrl !== networkNode
+    const notAlreadyUrl = bitcoin.networkNodes.indexOf(networkNode) === -1
+    if (notCurrentNode && notAlreadyUrl) {
+      bitcoin.networkNodes = [...bitcoin.networkNodes, networkNode]
+    }
+  })
+  res.send({ message: 'Bulk registered successfully.' })
 })
 
 app.listen(port, () => {
