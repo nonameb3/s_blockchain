@@ -12,17 +12,67 @@ const nodeAddress = uuid().split('-').join('')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+// ==================================
+// local Route
+// ==================================
+
 // fect blockchain
 app.get('/blockchain', (req, res) => {
   res.send(bitcoin)
 })
 
-// add newTransaction
+// add newTransaction to padding
 app.post('/transaction', (req, res) => {
-  const { amount, sender, recipient } = req.body
-  const blockIndex = bitcoin.createNewTransaction(amount, sender, recipient)
+  const newTransaction = req.body
+  const blockIndex = bitcoin.addTransactionToPandingTransantion(newTransaction)
   res.json({ message: `This transaction will be added in block ${blockIndex}.` })
 })
+
+// mine new Blockchain block
+app.get('/mine', (req, res) => {
+  const lastBlock = bitcoin.getLastBlock()
+  const previousBlockHash = lastBlock['hash']
+  const currentBlockData = {
+    transaction: bitcoin.pendingTransaction,
+    index: lastBlock['index'] + 1
+  }
+  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData)
+  const hash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce)
+  bitcoin.createNewTransaction(12.5, '00', nodeAddress) // reward
+  const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, hash)
+  return res.json({
+    massage: 'New block mine successfully',
+    block: newBlock
+  })
+})
+
+// register a node
+app.post('/register-node', (req, res) => {
+  const { newNodeUrl } = req.body
+  const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl
+  const notAlreadyUrl = bitcoin.networkNodes.indexOf(newNodeUrl) === -1
+  if (notCurrentNode && notAlreadyUrl) {
+    bitcoin.networkNodes = [...bitcoin.networkNodes, newNodeUrl]
+  }
+  res.send({ message: 'New node registered successfully with node.' })
+})
+
+// register multiple nodes at one, (recieve network node)
+app.post('/register-node-bulk', (req, res) => {
+  const { allnetworknode } = req.body
+  allnetworknode.map(networkNode => {
+    const notCurrentNode = bitcoin.currentNodeUrl !== networkNode
+    const notAlreadyUrl = bitcoin.networkNodes.indexOf(networkNode) === -1
+    if (notCurrentNode && notAlreadyUrl) {
+      bitcoin.networkNodes = [...bitcoin.networkNodes, networkNode]
+    }
+  })
+  res.send({ message: 'Bulk registered successfully.' })
+})
+
+// ==================================
+// broadcast Route
+// ==================================
 
 // add newTransaction Broadcast
 app.post('/transaction/broadcast', (req, res) => {
@@ -45,24 +95,6 @@ app.post('/transaction/broadcast', (req, res) => {
     res.send({ message: 'Transaction created and broadcast successfully' })
   }).catch(error => {
     res.send(error)
-  })
-})
-
-// mine Blockchain
-app.get('/mine', (req, res) => {
-  const lastBlock = bitcoin.getLastBlock()
-  const previousBlockHash = lastBlock['hash']
-  const currentBlockData = {
-    transaction: bitcoin.pendingTransaction,
-    index: lastBlock['index'] + 1
-  }
-  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData)
-  const hash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce)
-  bitcoin.createNewTransaction(12.5, '00', nodeAddress) // reward
-  const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, hash)
-  return res.json({
-    massage: 'New block mine successfully',
-    block: newBlock
   })
 })
 
@@ -98,29 +130,7 @@ app.post('/register-broadcast-node', (req, res) => {
   })
 })
 
-// register a node with network
-app.post('/register-node', (req, res) => {
-  const { newNodeUrl } = req.body
-  const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl
-  const notAlreadyUrl = bitcoin.networkNodes.indexOf(newNodeUrl) === -1
-  if (notCurrentNode && notAlreadyUrl) {
-    bitcoin.networkNodes = [...bitcoin.networkNodes, newNodeUrl]
-  }
-  res.send({ message: 'New node registered successfully with node.' })
-})
-
-// register multiple nodes at one
-app.post('/register-node-bulk', (req, res) => {
-  const { allnetworknode } = req.body
-  allnetworknode.map(networkNode => {
-    const notCurrentNode = bitcoin.currentNodeUrl !== networkNode
-    const notAlreadyUrl = bitcoin.networkNodes.indexOf(networkNode) === -1
-    if (notCurrentNode && notAlreadyUrl) {
-      bitcoin.networkNodes = [...bitcoin.networkNodes, networkNode]
-    }
-  })
-  res.send({ message: 'Bulk registered successfully.' })
-})
+// ==================================
 
 app.listen(port, () => {
   console.log(`server start at port : ${port}`)
