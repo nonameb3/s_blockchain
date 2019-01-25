@@ -6,6 +6,7 @@
   "scripts": {
     "start": "nodemon --watch dev -e js dev/node.js",
     "test": "node dev/__tests__/blockchain.test.js",
+    "debug": "nodemon --watch dev -e js dev/node.js 3001 http://localhost:3000",
     "node_1": "nodemon --watch dev -e js dev/node.js 3001 http://localhost:3001",
     "node_2": "nodemon --watch dev -e js dev/node.js 3002 http://localhost:3002",
     "node_3": "nodemon --watch dev -e js dev/node.js 3003 http://localhost:3003"

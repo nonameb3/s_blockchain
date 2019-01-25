@@ -1,5 +1,5 @@
 const sha256 = require('sha256')
-const currentNodeURL = process.argv[3]
+const currentNodeURL = process.argv[3] || 'http://localhost:3000'
 const uuid = require('uuid')
 
 function Blockchain () {

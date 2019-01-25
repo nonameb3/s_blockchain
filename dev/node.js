@@ -28,25 +28,26 @@ app.post('/transaction', (req, res) => {
   res.json({ message: `This transaction will be added in block ${blockIndex}.` })
 })
 
-// mine new Blockchain block
-app.get('/mine', (req, res) => {
+// receive new block
+app.post('/receive-new-block', (req, res) => {
+  const { newBlock } = req.body
   const lastBlock = bitcoin.getLastBlock()
-  const previousBlockHash = lastBlock['hash']
-  const currentBlockData = {
-    transaction: bitcoin.pendingTransaction,
-    index: lastBlock['index'] + 1
+  const isCorrectHash = lastBlock.hash === newBlock.previousBlockHash
+  const isCorrectIndex = lastBlock.index + 1 === newBlock.index
+  let message = ''
+
+  if (isCorrectHash && isCorrectIndex) {
+    bitcoin.chain = [...bitcoin.chain, newBlock]
+    bitcoin.pendingTransaction = []
+    message = 'New block received and accepted.'
+  } else {
+    message = 'New block rejected.'
   }
-  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData)
-  const hash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce)
-  bitcoin.createNewTransaction(12.5, '00', nodeAddress) // reward
-  const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, hash)
-  return res.json({
-    massage: 'New block mine successfully',
-    block: newBlock
-  })
+
+  res.json({ message, newBlock })
 })
 
-// register a node
+// register node to network
 app.post('/register-node', (req, res) => {
   const { newNodeUrl } = req.body
   const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl
@@ -57,7 +58,7 @@ app.post('/register-node', (req, res) => {
   res.send({ message: 'New node registered successfully with node.' })
 })
 
-// register multiple nodes at one, (recieve network node)
+// register multiple nodes at one, (receive network node)
 app.post('/register-node-bulk', (req, res) => {
   const { allnetworknode } = req.body
   allnetworknode.map(networkNode => {
@@ -73,6 +74,50 @@ app.post('/register-node-bulk', (req, res) => {
 // ==================================
 // broadcast Route
 // ==================================
+
+// mine new Blockchain block and async to network
+app.get('/mine', (req, res) => {
+  const lastBlock = bitcoin.getLastBlock()
+  const previousBlockHash = lastBlock['hash']
+  const currentBlockData = {
+    transaction: bitcoin.pendingTransaction,
+    index: lastBlock['index'] + 1
+  }
+  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData)
+  const hash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce)
+  const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, hash)
+
+  let requirePromise = []
+  bitcoin.networkNodes.map(networkNodeUrl => {
+    const requireOption = {
+      url: `${networkNodeUrl}/receive-new-block`,
+      method: 'POST',
+      body: { newBlock },
+      json: true
+    }
+    requirePromise = [...requirePromise, rp(requireOption)]
+  })
+
+  Promise.all(requirePromise).then(() => {
+    // reward for mine
+    const requireOption = {
+      url: `${bitcoin.currentNodeUrl}/transaction/broadcast`,
+      method: 'POST',
+      body: {
+        amount: 12.5,
+        seader: '00',
+        recipient: nodeAddress
+      },
+      json: true
+    }
+    return rp(requireOption)
+  }).then(() => {
+    return res.json({
+      massage: 'New block mine and broadcast successfully',
+      block: newBlock
+    })
+  }).catch(e => res.send(e))
+})
 
 // add newTransaction Broadcast
 app.post('/transaction/broadcast', (req, res) => {
