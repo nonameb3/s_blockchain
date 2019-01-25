@@ -24,6 +24,30 @@ app.post('/transaction', (req, res) => {
   res.json({ message: `This transaction will be added in block ${blockIndex}.` })
 })
 
+// add newTransaction Broadcast
+app.post('/transaction/broadcast', (req, res) => {
+  const { amount, seader, recipient } = req.body
+  const newTransaction = bitcoin.createNewTransaction(amount, seader, recipient)
+  bitcoin.addTransactionToPandingTransantion(newTransaction)
+
+  let requirePromise = []
+  bitcoin.networkNodes.map(networkNodeUrl => {
+    const requestOption = {
+      url: `${networkNodeUrl}/transaction`,
+      method: 'POST',
+      body: { newTransaction },
+      json: true
+    }
+    requirePromise = [...requirePromise, rp(requestOption)]
+  })
+
+  Promise.all(requirePromise).then(data => {
+    res.send({ message: 'Transaction created and broadcast successfully' })
+  }).catch(error => {
+    res.send(error)
+  })
+})
+
 // mine Blockchain
 app.get('/mine', (req, res) => {
   const lastBlock = bitcoin.getLastBlock()
@@ -67,7 +91,7 @@ app.post('/register-broadcast-node', (req, res) => {
     }
     return rp(bulkRegisterOption)
   }).then(data => {
-    res.json({ message: 'New node registered with network successfully.' })
+    res.json({ message: 'New node registered-broadcast with network successfully.' })
   }).catch(error => {
     console.error('/register-and-broadcast-node Promise error ' + error)
     res.send(error)
@@ -85,7 +109,7 @@ app.post('/register-node', (req, res) => {
   res.send({ message: 'New node registered successfully with node.' })
 })
 
-// register multiple nides at one
+// register multiple nodes at one
 app.post('/register-node-bulk', (req, res) => {
   const { allnetworknode } = req.body
   allnetworknode.map(networkNode => {
