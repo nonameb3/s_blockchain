@@ -107,7 +107,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="transaction in addressData.addressTransactions">
+						<tr ng-repeat="transaction in addressData.addressTransaction">
 							<td>{{ transaction.sender }}</td>
 							<td>{{ transaction.recipient }}</td>
 							<td>{{ transaction.amount }}</td>
@@ -150,11 +150,12 @@
 			$scope.fetchAddressData = function(address) {
 				$http.get(`/address/${address}`)
 				.then(response => {
-          $scope.addressData = response.data.addressData;
-          if (!$scope.addressData.addressTransaction.length)
-          $scope.addressData = null;
-					$scope.block = null;
-					$scope.transaction = null;
+					$scope.addressData = response.data.addressData;
+          if (!$scope.addressData.addressTransaction.length) {
+            $scope.addressData = null;
+            $scope.block = null;
+            $scope.transaction = null;
+          }
 				});				
 			};
 
