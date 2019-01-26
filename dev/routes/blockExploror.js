@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+var path = require('path')
 let bitcoin = null
 
 // ======================================
@@ -18,7 +19,13 @@ router.get('/transaction/:transactionId', (req, res) => {
 })
 
 router.get('/address/:addressId', (req, res) => {
+  const addressId = req.params.addressId
+  const addressData = bitcoin.getAddressData(addressId)
+  res.json({ addressData })
+})
 
+router.get('/', (req, res) => {
+  res.sendFile(path.resolve('dev/views/index.html'))
 })
 
 // ======================================

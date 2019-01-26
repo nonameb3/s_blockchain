@@ -106,6 +106,28 @@ Blockchain.prototype.getTransaction = function (transactionId) {
   return { block, transaction }
 }
 
+Blockchain.prototype.getAddressData = function (address) {
+  let transactions = []
+  this.chain.map(block => {
+    block.transaction.map(transaction => {
+      if (transaction.sender === address || transaction.recipient === address) {
+        transactions = [...transactions, transaction]
+      }
+    })
+  })
+
+  let balance = 0
+  transactions.map(transaction => {
+    if (transaction.sender === address) balance -= transaction.amount
+    if (transaction.recipient === address) balance += transaction.amount
+  })
+
+  return {
+    addressTransaction: transactions,
+    addressBalance: balance
+  }
+}
+
 // =======================
 
 module.exports = Blockchain
