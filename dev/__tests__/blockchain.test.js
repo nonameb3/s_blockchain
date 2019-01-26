@@ -1,7 +1,10 @@
+/*eslint-disable */
 const Blockchain = require('../blockchain')
+const blockchainOj = require('././blockOj')
 const Bitcoin = new Blockchain()
+const BitcoinOj = blockchainOj
 
-console.log(Bitcoin)
+console.log(Bitcoin.chainInValid(blockchainOj.chain))
 
 // test proof of work
 // ================================

@@ -67,11 +67,11 @@ Blockchain.prototype.chainInValid = function (blockchain) {
 
   for (let i = 1; i < blockchain.length; i++) {
     const currentBlockData = blockchain[i]
-    const previousBlocData = blockchain[i - 1]
+    const previousBlockData = blockchain[i - 1]
     const { index, transaction } = currentBlockData
-    const currentBlockHash = this.hashBlock(previousBlocData.hash, { transaction, index }, currentBlockData.nonce)
+    const currentBlockHash = this.hashBlock(previousBlockData.hash, { transaction, index }, currentBlockData.nonce)
     if (currentBlockHash.substring(0, 4) !== '0000') inValid = false
-    if (currentBlockData.hash !== previousBlocData.previousBlockHash) inValid = false
+    if (currentBlockData.previousBlockHash !== previousBlockData.hash) inValid = false
   }
 
   const { nonce, hash, previousBlockHash, transaction } = blockchain[0]

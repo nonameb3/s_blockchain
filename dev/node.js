@@ -175,6 +175,51 @@ app.post('/register-broadcast-node', (req, res) => {
   })
 })
 
+// ckeck longest blockchain and replace this node
+app.get('/concensus', (req, res) => {
+  let requirePromise = []
+
+  bitcoin.networkNodes.map(networkNodeUrl => {
+    const requireOption = {
+      url: `${networkNodeUrl}/blockchain`,
+      method: 'GET',
+      json: true
+    }
+    requirePromise = [...requirePromise, rp(requireOption)]
+  })
+
+  Promise.all(requirePromise).then(blockchains => {
+    const currentChainLength = bitcoin.chain.length
+    let maxChainLength = currentChainLength
+    let newLongestChain = null
+    let newPendingTransaction = null
+
+    // find longest blockchain
+    blockchains.map(blockchain => {
+      if (blockchain.chain.length > maxChainLength) {
+        maxChainLength = blockchain.chain.length
+        newLongestChain = [...blockchain.chain]
+        newPendingTransaction = [...blockchain.pendingTransaction]
+      }
+    })
+
+    // replace longest to this chain
+    if (!newLongestChain || (newLongestChain && !bitcoin.chainInValid(newLongestChain))) {
+      res.json({
+        message: 'Current chain has not been replaced.',
+        chain: bitcoin.chain
+      })
+    } else {
+      bitcoin.chain = [...newLongestChain]
+      bitcoin.pendingTransaction = [...newPendingTransaction]
+      res.json({
+        message: 'This chain has been replaced',
+        chain: newLongestChain
+      })
+    }
+  })
+})
+
 // ==================================
 
 app.listen(port, () => {
