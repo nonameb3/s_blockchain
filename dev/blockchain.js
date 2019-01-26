@@ -82,4 +82,30 @@ Blockchain.prototype.chainInValid = function (blockchain) {
   return inValid
 }
 
+// =======================
+// Get method for exploror
+// =======================
+
+Blockchain.prototype.getBlockByHash = function (blockHash) {
+  const block = this.chain.filter(block => block.hash === blockHash)
+  return block
+}
+
+Blockchain.prototype.getTransaction = function (transactionId) {
+  let transaction = null
+  let block = null
+  this.chain.map(_block => {
+    _block.transaction.filter(_transaction => {
+      if (_transaction.transactionId === transactionId) {
+        transaction = _transaction
+        block = _block
+      }
+    })
+  })
+
+  return { block, transaction }
+}
+
+// =======================
+
 module.exports = Blockchain

@@ -9,8 +9,11 @@ const app = express()
 const bitcoin = new Blockchain()
 const nodeAddress = uuid().split('-').join('')
 
+const explororRoute = require('./routes/blockExploror')
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use('/', explororRoute(bitcoin))
 
 // ==================================
 // local Route
