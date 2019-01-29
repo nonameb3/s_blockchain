@@ -139,7 +139,7 @@ app.post('/transaction/broadcast', (req, res) => {
     requirePromise = [...requirePromise, rp(requestOption)]
   })
 
-  Promise.all(requirePromise).then(data => {
+  Promise.all(requirePromise).then(() => {
     res.send({ message: 'Transaction created and broadcast successfully' })
   }).catch(error => {
     res.send(error)
@@ -162,7 +162,7 @@ app.post('/register-broadcast-node', (req, res) => {
     }
     regNodePromise = [...regNodePromise, rp(requestOption)]
   })
-  Promise.all(regNodePromise).then(data => {
+  Promise.all(regNodePromise).then(() => {
     const bulkRegisterOption = {
       url: `${newNodeUrl}/register-node-bulk`,
       method: 'POST',
@@ -170,7 +170,7 @@ app.post('/register-broadcast-node', (req, res) => {
       json: true
     }
     return rp(bulkRegisterOption)
-  }).then(data => {
+  }).then(() => {
     res.json({ message: 'New node registered-broadcast with network successfully.' })
   }).catch(error => {
     console.error('/register-and-broadcast-node Promise error ' + error)
